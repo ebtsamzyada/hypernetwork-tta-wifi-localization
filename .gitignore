@@ -1,0 +1,9 @@
+data/
+data_sod/
+data_csi/
+data_csi/**
+*.zip
+__pycache__/
+*.pyc
+.DS_Store
+*.egg-info/
