@@ -1,0 +1,152 @@
+[
+  {
+    "epoch": 1,
+    "train": {
+      "avg_loss": 61.59255048999169,
+      "floor_accuracy": 0.5128953771289537,
+      "median_xy_err_m": 1.2617604732513428,
+      "median_3d_err_m": 3.5944578902415163
+    },
+    "val": {
+      "avg_loss": 5.708388388123592,
+      "floor_accuracy": 0.6877094972067039,
+      "median_xy_err_m": 1.0119825601577759,
+      "median_3d_err_m": 1.32984459400177
+    }
+  },
+  {
+    "epoch": 2,
+    "train": {
+      "avg_loss": 13.872955793968952,
+      "floor_accuracy": 0.7318734793187348,
+      "median_xy_err_m": 0.8920967876911163,
+      "median_3d_err_m": 1.1447526216506958
+    },
+    "val": {
+      "avg_loss": 3.0992272749126957,
+      "floor_accuracy": 0.7357541899441341,
+      "median_xy_err_m": 0.928462028503418,
+      "median_3d_err_m": 1.1752128601074219
+    }
+  },
+  {
+    "epoch": 3,
+    "train": {
+      "avg_loss": 5.3069553048293265,
+      "floor_accuracy": 0.7968369829683698,
+      "median_xy_err_m": 0.7060194909572601,
+      "median_3d_err_m": 0.8762799501419067
+    },
+    "val": {
+      "avg_loss": 2.7899384959241864,
+      "floor_accuracy": 0.7452513966480447,
+      "median_xy_err_m": 0.9309710264205933,
+      "median_3d_err_m": 1.1469157934188843
+    }
+  },
+  {
+    "epoch": 4,
+    "train": {
+      "avg_loss": 3.2192369598478368,
+      "floor_accuracy": 0.8199513381995134,
+      "median_xy_err_m": 0.63514044880867,
+      "median_3d_err_m": 0.7496600151062012
+    },
+    "val": {
+      "avg_loss": 2.337995435617989,
+      "floor_accuracy": 0.7871508379888268,
+      "median_xy_err_m": 0.8712407350540161,
+      "median_3d_err_m": 1.0242040157318115
+    }
+  },
+  {
+    "epoch": 5,
+    "train": {
+      "avg_loss": 2.746537028240729,
+      "floor_accuracy": 0.8344282238442823,
+      "median_xy_err_m": 0.6089887619018555,
+      "median_3d_err_m": 0.7167444229125977
+    },
+    "val": {
+      "avg_loss": 2.4328430417821063,
+      "floor_accuracy": 0.8195530726256983,
+      "median_xy_err_m": 0.8017495274543762,
+      "median_3d_err_m": 1.0240902304649353
+    }
+  },
+  {
+    "epoch": 6,
+    "train": {
+      "avg_loss": 2.3543476058248376,
+      "floor_accuracy": 0.8457420924574209,
+      "median_xy_err_m": 0.5712586641311646,
+      "median_3d_err_m": 0.6658973693847656
+    },
+    "val": {
+      "avg_loss": 2.4718499517765458,
+      "floor_accuracy": 0.7860335195530727,
+      "median_xy_err_m": 0.8281732797622681,
+      "median_3d_err_m": 1.1521505117416382
+    }
+  },
+  {
+    "epoch": 7,
+    "train": {
+      "avg_loss": 2.120516684268309,
+      "floor_accuracy": 0.8586374695863747,
+      "median_xy_err_m": 0.5515222549438477,
+      "median_3d_err_m": 0.6345205307006836
+    },
+    "val": {
+      "avg_loss": 2.315649778247348,
+      "floor_accuracy": 0.794413407821229,
+      "median_xy_err_m": 0.8155754804611206,
+      "median_3d_err_m": 0.9922629594802856
+    }
+  },
+  {
+    "epoch": 8,
+    "train": {
+      "avg_loss": 1.891800218935401,
+      "floor_accuracy": 0.8744525547445255,
+      "median_xy_err_m": 0.5365009605884552,
+      "median_3d_err_m": 0.5980916321277618
+    },
+    "val": {
+      "avg_loss": 2.395425828537961,
+      "floor_accuracy": 0.852513966480447,
+      "median_xy_err_m": 0.8168728351593018,
+      "median_3d_err_m": 0.9352802634239197
+    }
+  },
+  {
+    "epoch": 9,
+    "train": {
+      "avg_loss": 1.7220794979902099,
+      "floor_accuracy": 0.8813868613138686,
+      "median_xy_err_m": 0.5385174751281738,
+      "median_3d_err_m": 0.5913866460323334
+    },
+    "val": {
+      "avg_loss": 2.429626081124281,
+      "floor_accuracy": 0.852513966480447,
+      "median_xy_err_m": 0.9539232850074768,
+      "median_3d_err_m": 1.0357505083084106
+    }
+  },
+  {
+    "epoch": 10,
+    "train": {
+      "avg_loss": 1.6861994379506233,
+      "floor_accuracy": 0.885279805352798,
+      "median_xy_err_m": 0.5249709188938141,
+      "median_3d_err_m": 0.583297848701477
+    },
+    "val": {
+      "avg_loss": 2.4430795126932794,
+      "floor_accuracy": 0.8581005586592179,
+      "median_xy_err_m": 0.8560005724430084,
+      "median_3d_err_m": 0.9439918696880341
+    }
+  }
+]

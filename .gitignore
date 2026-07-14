@@ -1,0 +1,10 @@
+# Downloaded dataset -- reproducible, see PIVOT_PLAN.md for source URLs
+data/raw/
+
+# Trained model checkpoints -- large binaries, regenerate via scripts/*.py
+outputs/**/*.pt
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/

@@ -1,0 +1,27 @@
+{
+  "held_out_points": 58,
+  "results": {
+    "Layout 1 (reference, no obstruction)": {
+      "avg_loss": 3.2667503227762293,
+      "floor_accuracy": 0.7837078651685393,
+      "median_xy_err_m": 0.8452376127243042,
+      "median_3d_err_m": 1.0496801137924194,
+      "n": 1780
+    },
+    "Layout 2 (partial obstruction)": {
+      "avg_loss": 3.8386026307341012,
+      "floor_accuracy": 0.7275862068965517,
+      "median_xy_err_m": 0.8863661885261536,
+      "median_3d_err_m": 1.2324994802474976,
+      "n": 1740
+    },
+    "Layout 3 (full obstruction)": {
+      "avg_loss": 4.097998786473583,
+      "floor_accuracy": 0.653448275862069,
+      "median_xy_err_m": 0.8121744394302368,
+      "median_3d_err_m": 1.4229100942611694,
+      "n": 1740
+    }
+  },
+  "monotonic": false
+}

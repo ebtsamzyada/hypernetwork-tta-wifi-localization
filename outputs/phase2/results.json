@@ -1,0 +1,31 @@
+{
+  "hyperparams": {
+    "k_strongest": 5,
+    "noise_std": 2.0,
+    "margin_m": 2.0,
+    "max_extent_m": 10.0,
+    "learning_rate": 0.0001,
+    "pseudo_batch": 16,
+    "lambda_floor": 1.0
+  },
+  "naive_baseline": {
+    "pred_xy": [
+      0.8722627737226277,
+      24.11557177615572
+    ],
+    "majority_floor": 2,
+    "median_xy_err_m": 11.0174605812593,
+    "mean_xy_err_m": 11.76456388444571,
+    "floor_accuracy": 0.3202247191011236,
+    "n_eval": 1780
+  },
+  "test_metrics": {
+    "avg_loss": 3.2667503227762293,
+    "floor_accuracy": 0.7837078651685393,
+    "median_xy_err_m": 0.8452376127243042,
+    "median_3d_err_m": 1.0496801137924194
+  },
+  "n_train": 8220,
+  "n_val": 1790,
+  "n_test": 1780
+}
