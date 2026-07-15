@@ -999,3 +999,74 @@ from that isn't confounded with location in the first place.
 Raw results: `outputs/phase6/oracle_diagnostic_synthetic_drift.json`,
 `outputs/phase6b/oracle_diagnostic_pooled.json`,
 `outputs/phase6c/oracle_diagnostic_normalized.json`.
+
+### Phase 6d: one more trial, a genuinely different signal source -- still negative (2026-07-15)
+
+Phases 6/6b/6c all used hand-crafted RSSI summary statistics as the buffer
+signature. Phase 6d replaces the feature source entirely: the frozen
+backbone's own 128-d bottleneck embedding (`MultiSiteGlobLocCNN.features()`),
+summarized as embedding-space displacement between each buffer's mean
+embedding and its reference buffer's mean embedding
+(`scripts/phase6d_oracle_diagnostic_embedding.py`). Rationale: the backbone
+already learned what's relevant to localization from the RSSI pattern, so
+feature-space drift should be a more direct proxy for induced error than
+generic RSSI statistics, and it's dimension-independent by construction
+(always 128-d) so it can't leak site identity via AP-count the way Phase
+6b's raw stats did.
+
+| predictor | normalized target | raw target |
+|---|---|---|
+| Leave-points-out RF | 0.100 | 0.132 |
+| Point-identity alone | 0.635 | 0.685 |
+| Leave-SITE-out RF | **-0.684** | **-1.184** |
+
+Negative, and leave-site-out generalization is WORSE than every RSSI-stats
+version (6b: -0.052, 6c: -0.047 to -0.268). Point-identity R^2 is unchanged
+from 6b/6c (as expected -- it depends only on the target's own group
+structure, not the feature source).
+
+### Phase 6e/6f: root-causing why embedding-drift generalized worse, not just "also negative"
+
+Two follow-up, non-open-ended investigations (both cheap, both run once):
+
+**Phase 6e** (`scripts/phase6e_trunk_divergence.py`) tested the obvious
+hypothesis first: per-site fine-tuning (Phase 5c) adapts the trunk per
+site, so maybe the "shared embedding space" the whole idea depends on no
+longer exists by the time Phase 6d runs. Measured directly in weight space
+(pairwise L2 distance between each site's fine-tuned trunk and the
+pre-fine-tune joint checkpoint, `outputs/phase5b_v4/model.pt`) -- **this
+hypothesis was wrong**: all six site trunks stayed within 0.8%-4.3% relative
+L2 distance of the joint trunk (cosine similarity > 0.999 for every pair).
+Fine-tuning's low LR and short schedule barely moved the weights. Figure:
+`outputs/phase6e/trunk_divergence_heatmap.png`.
+
+**Phase 6f** (`scripts/phase6f_feature_analysis.py`), using Phase 6d's
+saved raw per-instance arrays, found two things instead:
+1. Embedding-drift feature scale (median L2 displacement) varies by
+   ~31% across sites (1.69 to 2.28) even with near-identical trunks --
+   a real but modest scale confound, not the full explanation on its own.
+   Figure: `outputs/phase6f/feature_scale_by_site.png`.
+2. The leave-site-out RF's predictions collapse into a narrow, nearly
+   constant band (roughly -3 to 8) regardless of the true target's much
+   wider range (-5 to 27) -- it isn't tracking drift severity for an
+   unseen site at all, just outputting something close to the pooled
+   training mean. Figure: `outputs/phase6f/leave_site_out_actual_vs_pred.png`.
+
+**Conclusion**: gross weight divergence is ruled out. The likelier
+explanation is that the bottleneck embedding, trained purely to make
+xy/floor decodable, doesn't reliably preserve drift-SEVERITY information
+in a way that's consistent across sites with very different native AP
+counts/layouts (17 dense APs at HDLC vs. 520 sparse APs at UJI) -- whatever
+weak correlation exists is site-idiosyncratic (hence the modest
+leave-points-out R^2 within a site) rather than a transferable physical
+signal, and is in fact slightly worse-conditioned for cross-site transfer
+than plain RSSI statistics were, since those are at least pre-normalized
+into a common physical unit range before any nonlinear transform sees them.
+
+This is the fifth independent negative trial (real drift, synthetic drift,
+pooled, corrected, embedding-based), now with a mechanistic explanation
+rather than just another data point -- strengthens rather than changes the
+standing verdict above.
+
+Raw results: `outputs/phase6d/oracle_diagnostic_embedding.json`,
+`outputs/phase6e/trunk_divergence.json`, `outputs/phase6f/feature_scale_analysis.json`.

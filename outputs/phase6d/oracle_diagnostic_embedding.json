@@ -1,0 +1,22 @@
+{
+  "normalized": {
+    "r2_rf_leave_points_out": 0.1003975320933802,
+    "r2_ridge_leave_points_out": 0.03474007158706993,
+    "r2_point_identity_oracle": 0.6354446457002589,
+    "r2_rf_leave_site_out": -0.6843536920856592
+  },
+  "raw": {
+    "r2_rf_leave_points_out": 0.13205995937742376,
+    "r2_ridge_leave_points_out": 0.06164843114268981,
+    "r2_point_identity_oracle": 0.6845851312065407,
+    "r2_rf_leave_site_out": -1.1844685875222027
+  },
+  "site_medians": {
+    "uji_b1": 3.7699867486953735,
+    "uji_b2": 3.7552759647369385,
+    "sod_cetc331": 3.0071756839752197,
+    "hdlc": 1.9921343326568604,
+    "sod_syl": 1.8771061301231384,
+    "sod_hcxy": 1.8584221005439758
+  }
+}
