@@ -192,6 +192,59 @@ def _load_uji_site(site_id):
     return df[["site_id", "floor_id", "x", "y", "_group"] + wap_cols], wap_positions, wap_cols
 
 
+# ------------------------------------------------------------------ Tampere ----
+# Lohan et al., "Crowdsourced WiFi database and benchmark software for
+# indoor positioning", Zenodo 10.5281/zenodo.1001662 (v2), MIT/CC-BY.
+# 4-floor university building, Tampere, Finland -- a genuinely new
+# country/site relative to HDLC (Malaysia)/SODIndoorLoc (China)/
+# UJIIndoorLoc (Spain). Audited: 992 AP columns, +100 sentinel (confirmed,
+# UJI-style), no published AP positions (must estimate, like UJI), no
+# floor column -- floor is derived from z (local coordinate, meters),
+# which takes exactly 5 distinct values (0, 3.7, 7.4, 11.1, 14.8) spaced
+# uniformly at 3.7m -- floor_id = round(z / 3.7). No user/session id
+# column exists; device model + calendar day is used as the leakage-safe
+# group instead (crowdsourced, bursty by device+day, same rationale as
+# UJIIndoorLoc's session grouping -- see wifi_tta/src/data_loader.py).
+
+TAMPERE_ROOT = Path(__file__).resolve().parents[1] / "data" / "raw_tampere" / "FINGERPRINTING_DB"
+TAMPERE_SENTINEL = 100.0
+TAMPERE_FLOOR_HEIGHT_M = 3.7
+
+
+def _load_tampere():
+    tr_rss = pd.read_csv(TAMPERE_ROOT / "Training_rss_21Aug17.csv", header=None)
+    te_rss = pd.read_csv(TAMPERE_ROOT / "Test_rss_21Aug17.csv", header=None)
+    tr_crd = pd.read_csv(TAMPERE_ROOT / "Training_coordinates_21Aug17.csv", header=None, names=["x", "y", "z"])
+    te_crd = pd.read_csv(TAMPERE_ROOT / "Test_coordinates_21Aug17.csv", header=None, names=["x", "y", "z"])
+    tr_dev = pd.read_csv(TAMPERE_ROOT / "Training_device_21Aug17.csv", header=None, names=["device"])
+    te_dev = pd.read_csv(TAMPERE_ROOT / "Test_device_21Aug17.csv", header=None, names=["device"])
+    tr_date = pd.read_csv(TAMPERE_ROOT / "Training_date_21Aug17.csv", header=None, names=["date"])
+    te_date = pd.read_csv(TAMPERE_ROOT / "Test_date_21Aug17.csv", header=None, names=["date"])
+
+    wap_cols = [f"WAP{i:04d}" for i in range(tr_rss.shape[1])]
+    rssi = pd.concat([tr_rss, te_rss], ignore_index=True)
+    rssi.columns = wap_cols
+    rssi = rssi.apply(pd.to_numeric, errors="coerce")
+    rssi = rssi.mask(rssi == TAMPERE_SENTINEL, np.nan).fillna(RSSI_MIN).clip(RSSI_MIN, RSSI_MAX)
+
+    crd = pd.concat([tr_crd, te_crd], ignore_index=True)
+    dev = pd.concat([tr_dev, te_dev], ignore_index=True)
+    date = pd.concat([tr_date, te_date], ignore_index=True)
+
+    df = pd.DataFrame({
+        "site_id": "tampere",
+        "floor_id": (crd["z"] / TAMPERE_FLOOR_HEIGHT_M).round().astype(int),
+        "x": crd["x"].astype(float),
+        "y": crd["y"].astype(float),
+    })
+    df = pd.concat([df, rssi.astype(np.float32)], axis=1)
+    day = date["date"].str.slice(0, 10)  # YYYY-MM-DD
+    df["_group"] = dev["device"].astype(str) + "_" + day
+
+    wap_positions = estimate_ap_positions_from_data(df, wap_cols, RSSI_MIN, RSSI_MAX)
+    return df[["site_id", "floor_id", "x", "y", "_group"] + wap_cols], wap_positions, wap_cols
+
+
 # --------------------------------------------------------------- registry ----
 
 _LOADERS = {
@@ -202,6 +255,7 @@ _LOADERS = {
     "uji_b0": lambda: _load_uji_site("uji_b0"),
     "uji_b1": lambda: _load_uji_site("uji_b1"),
     "uji_b2": lambda: _load_uji_site("uji_b2"),
+    "tampere": _load_tampere,
 }
 
 

@@ -8,10 +8,19 @@ class MultiSiteGlobLocCNN(nn.Module):
     """Shared 5-block conv trunk + SPP + xy_head (all site-agnostic, since
     the regression target is already local pixel coordinates within each
     sample's own generated image -- see PIVOT_PLAN.md "Multi-site audit").
-    Floor classification is NOT shared: floor label spaces aren't
-    comparable across sites (site A's "floor 2" has no relation to site
-    B's "floor 2"), so each site gets its own small linear floor head off
-    the same 128-d bottleneck."""
+
+    Floor "classification" is actually ORDINAL REGRESSION: each site gets
+    its own small linear head outputting a single scalar (not
+    num_floors logits), trained with a regression loss against the floor
+    index and rounded to the nearest valid class at inference. Motivated
+    by Phase 5d's error analysis: floor confusion is consistently
+    ADJACENT (floor 0<->1 confused far more than floor 0<->2), which plain
+    cross-entropy can't exploit since it treats every wrong class as
+    equally wrong -- an ordinal loss penalizes being off by 2 floors more
+    than being off by 1, matching the actual error structure. Floor label
+    spaces aren't comparable across sites (site A's "floor 2" has no
+    relation to site B's "floor 2"), so heads are still per-site, off the
+    same shared 128-d bottleneck."""
 
     def __init__(self, site_num_floors: dict, spp_levels=(4, 2, 1)):
         super().__init__()
@@ -28,8 +37,9 @@ class MultiSiteGlobLocCNN(nn.Module):
             nn.Linear(128, 64), nn.LeakyReLU(0.1, inplace=True),
             nn.Linear(64, 2),
         )
+        self.site_num_floors = dict(site_num_floors)  # kept for inference-time clamping, not layer sizing
         self.floor_heads = nn.ModuleDict({
-            site_id: nn.Linear(128, n) for site_id, n in site_num_floors.items()
+            site_id: nn.Linear(128, 1) for site_id in site_num_floors
         })
 
         self._init_weights()
@@ -51,9 +61,10 @@ class MultiSiteGlobLocCNN(nn.Module):
     def forward(self, x, site_id: str):
         """site_id must be a key in self.floor_heads, EXCEPT for zero-shot
         sites not seen during training -- pass site_id=None to get only
-        (xy_pred, None), skipping floor classification entirely (there is
-        no head to use)."""
+        (xy_pred, None), skipping floor prediction entirely (there is no
+        head to use). floor_pred is a raw scalar (B, 1) -- round/clamp to
+        [0, num_floors-1] at the call site (see multisite_train.py)."""
         feat = self.features(x)
         xy_pred = self.xy_head(feat)
-        floor_logits = self.floor_heads[site_id](feat) if site_id in self.floor_heads else None
-        return xy_pred, floor_logits
+        floor_pred = self.floor_heads[site_id](feat) if site_id in self.floor_heads else None
+        return xy_pred, floor_pred

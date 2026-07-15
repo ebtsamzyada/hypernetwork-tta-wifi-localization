@@ -1,0 +1,164 @@
+{
+  "hdlc": {
+    "joint": {
+      "n": 1790,
+      "median_xy_err_m": 0.682610273361206,
+      "floor_accuracy": 0.6245810055865921,
+      "floor_mae": 0.3754189944134078,
+      "median_3d_err_m": 1.2842813730239868
+    },
+    "finetuned": {
+      "n": 1790,
+      "median_xy_err_m": 0.6376678347587585,
+      "floor_accuracy": 0.7491620111731844,
+      "floor_mae": 0.2737430167597765,
+      "median_3d_err_m": 0.9935702681541443
+    },
+    "naive": {
+      "pred_xy": [
+        0.874390243902439,
+        24.048780487804876
+      ],
+      "majority_floor": 2,
+      "median_xy_err_m": 13.049385044121587,
+      "mean_xy_err_m": 12.162062925783896,
+      "floor_accuracy": 0.3016759776536313,
+      "n_eval": 1790
+    }
+  },
+  "sod_cetc331": {
+    "joint": {
+      "n": 223,
+      "median_xy_err_m": 1.784194827079773,
+      "floor_accuracy": 0.9147982062780269,
+      "floor_mae": 0.08520179372197309,
+      "median_3d_err_m": 1.9368630647659302
+    },
+    "finetuned": {
+      "n": 223,
+      "median_xy_err_m": 1.7788810729980469,
+      "floor_accuracy": 0.9506726457399103,
+      "floor_mae": 0.04932735426008968,
+      "median_3d_err_m": 1.8899576663970947
+    },
+    "naive": {
+      "pred_xy": [
+        53.498490865766485,
+        33.17442414614773
+      ],
+      "majority_floor": 2,
+      "median_xy_err_m": 15.978493946319611,
+      "mean_xy_err_m": 17.310578394282217,
+      "floor_accuracy": 0.3004484304932735,
+      "n_eval": 223
+    }
+  },
+  "sod_hcxy": {
+    "joint": {
+      "n": 1820,
+      "median_xy_err_m": 2.1715351343154907,
+      "floor_accuracy": 1.0,
+      "floor_mae": 0.0,
+      "median_3d_err_m": 2.1715351343154907
+    },
+    "finetuned": {
+      "n": 1820,
+      "median_xy_err_m": 1.7066528797149658,
+      "floor_accuracy": 1.0,
+      "floor_mae": 0.0,
+      "median_3d_err_m": 1.7066528797149658
+    },
+    "naive": {
+      "pred_xy": [
+        931.0842743259086,
+        896.2032895662368
+      ],
+      "majority_floor": 4,
+      "median_xy_err_m": 36.26665754068284,
+      "mean_xy_err_m": 34.98540409698639,
+      "floor_accuracy": 1.0,
+      "n_eval": 1820
+    }
+  },
+  "sod_syl": {
+    "joint": {
+      "n": 1590,
+      "median_xy_err_m": 1.8063623905181885,
+      "floor_accuracy": 1.0,
+      "floor_mae": 0.0,
+      "median_3d_err_m": 1.8063623905181885
+    },
+    "finetuned": {
+      "n": 1590,
+      "median_xy_err_m": 1.7166204452514648,
+      "floor_accuracy": 1.0,
+      "floor_mae": 0.0,
+      "median_3d_err_m": 1.7166204452514648
+    },
+    "naive": {
+      "pred_xy": [
+        46.9458208516887,
+        13.601546255506607
+      ],
+      "majority_floor": 4,
+      "median_xy_err_m": 21.436573194225783,
+      "mean_xy_err_m": 20.923746539400124,
+      "floor_accuracy": 1.0,
+      "n_eval": 1590
+    }
+  },
+  "uji_b1": {
+    "joint": {
+      "n": 1779,
+      "median_xy_err_m": 1.185546875,
+      "floor_accuracy": 0.3428892636312535,
+      "floor_mae": 0.9353569421023047,
+      "median_3d_err_m": 3.7301647989690405
+    },
+    "finetuned": {
+      "n": 1779,
+      "median_xy_err_m": 1.244140625,
+      "floor_accuracy": 0.3794266441821248,
+      "floor_mae": 0.8622821810005621,
+      "median_3d_err_m": 3.6426768503700457
+    },
+    "naive": {
+      "pred_xy": [
+        -7530.863613818476,
+        4864901.713259348
+      ],
+      "majority_floor": 1,
+      "median_xy_err_m": 96.3639633111552,
+      "mean_xy_err_m": 78.29438240714003,
+      "floor_accuracy": 0.2804946599213041,
+      "n_eval": 1779
+    }
+  },
+  "uji_b2": {
+    "joint": {
+      "n": 2355,
+      "median_xy_err_m": 0.5082688927650452,
+      "floor_accuracy": 0.16900212314225052,
+      "floor_mae": 1.3358811040339702,
+      "median_3d_err_m": 3.6775668892883164
+    },
+    "finetuned": {
+      "n": 2355,
+      "median_xy_err_m": 0.22412109375,
+      "floor_accuracy": 0.3307855626326964,
+      "floor_mae": 1.1660297239915074,
+      "median_3d_err_m": 3.535537277759399
+    },
+    "naive": {
+      "pred_xy": [
+        -7349.892976038201,
+        4864819.4427800635
+      ],
+      "majority_floor": 1,
+      "median_xy_err_m": 51.57137034986225,
+      "mean_xy_err_m": 44.775176415422344,
+      "floor_accuracy": 0.15881104033970275,
+      "n_eval": 2355
+    }
+  }
+}

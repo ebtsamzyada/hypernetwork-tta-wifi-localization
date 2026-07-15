@@ -1,0 +1,61 @@
+Re-deriving splits/site_num_floors for all 6 pretraining sites...
+[hdlc] 11790 rows, 384 groups, 17 AP columns (17/17 positioned), floors=[0, 1, 2]
+[sod_cetc331] 1795 rows, 955 groups, 52 AP columns (52/52 positioned), floors=[1, 2, 3]
+[sod_hcxy] 12230 rows, 465 groups, 56 AP columns (56/56 positioned), floors=[4]
+[sod_syl] 9900 rows, 397 groups, 46 AP columns (46/46 positioned), floors=[4]
+[uji_b1] 5196 rows, 12 groups, 520 AP columns (169/520 positioned), floors=[0, 1, 2, 3]
+[uji_b1] dropped 37/5196 rows with no positioned visible AP (0.7%).
+[uji_b2] 9492 rows, 16 groups, 520 AP columns (153/520 positioned), floors=[0, 1, 2, 3, 4]
+[uji_b2] dropped 38/9492 rows with no positioned visible AP (0.4%).
+
+==============================================================================
+Continuing fine-tune: uji_b1 (+15 more epochs)
+==============================================================================
+[uji_b1] starting from phase5c_v2 checkpoint: xy=0.67m floor_acc=0.412
+    ft epoch 1/15 | train_xy 0.23m | val_xy 0.50m val_floor_acc 0.479 val_3d 3.50m
+    ft epoch 2/15 | train_xy 0.29m | val_xy 0.51m val_floor_acc 0.484 val_3d 3.50m
+    ft epoch 3/15 | train_xy 0.25m | val_xy 0.50m val_floor_acc 0.492 val_3d 3.50m
+    ft epoch 4/15 | train_xy 0.22m | val_xy 0.50m val_floor_acc 0.504 val_3d 3.50m
+    ft epoch 5/15 | train_xy 0.25m | val_xy 0.50m val_floor_acc 0.510 val_3d 3.50m
+    ft epoch 6/15 | train_xy 0.22m | val_xy 0.43m val_floor_acc 0.536 val_3d 2.49m
+    ft epoch 7/15 | train_xy 0.20m | val_xy 0.50m val_floor_acc 0.555 val_3d 1.73m
+    ft epoch 8/15 | train_xy 0.24m | val_xy 0.50m val_floor_acc 0.537 val_3d 2.47m
+    ft epoch 9/15 | train_xy 0.25m | val_xy 0.50m val_floor_acc 0.577 val_3d 1.49m
+    ft epoch 10/15 | train_xy 0.24m | val_xy 0.50m val_floor_acc 0.594 val_3d 1.17m
+    ft epoch 11/15 | train_xy 0.21m | val_xy 0.50m val_floor_acc 0.560 val_3d 1.52m
+    ft epoch 12/15 | train_xy 0.22m | val_xy 0.42m val_floor_acc 0.567 val_3d 1.46m
+    ft epoch 13/15 | train_xy 0.24m | val_xy 0.50m val_floor_acc 0.580 val_3d 1.35m
+    ft epoch 14/15 | train_xy 0.20m | val_xy 0.46m val_floor_acc 0.567 val_3d 1.50m
+    ft epoch 15/15 | train_xy 0.19m | val_xy 0.48m val_floor_acc 0.588 val_3d 1.12m
+[uji_b1] after +15 epochs: xy=0.67m floor_acc=0.460  (2722s)
+[uji_b1] naive: xy=59.53m floor_acc=0.000
+
+==============================================================================
+Continuing fine-tune: uji_b2 (+15 more epochs)
+==============================================================================
+[uji_b2] starting from phase5c_v2 checkpoint: xy=0.50m floor_acc=0.429
+    ft epoch 1/15 | train_xy 0.16m | val_xy 0.18m val_floor_acc 0.509 val_3d 2.36m
+    ft epoch 2/15 | train_xy 0.16m | val_xy 0.24m val_floor_acc 0.511 val_3d 2.91m
+    ft epoch 3/15 | train_xy 0.15m | val_xy 0.24m val_floor_acc 0.553 val_3d 1.00m
+    ft epoch 4/15 | train_xy 0.14m | val_xy 0.22m val_floor_acc 0.551 val_3d 0.59m
+    ft epoch 5/15 | train_xy 0.15m | val_xy 0.19m val_floor_acc 0.547 val_3d 0.67m
+    ft epoch 6/15 | train_xy 0.17m | val_xy 0.25m val_floor_acc 0.553 val_3d 1.00m
+    ft epoch 7/15 | train_xy 0.16m | val_xy 0.28m val_floor_acc 0.576 val_3d 0.60m
+    ft epoch 8/15 | train_xy 0.16m | val_xy 0.22m val_floor_acc 0.586 val_3d 0.56m
+    ft epoch 9/15 | train_xy 0.16m | val_xy 0.24m val_floor_acc 0.601 val_3d 0.53m
+    ft epoch 10/15 | train_xy 0.15m | val_xy 0.21m val_floor_acc 0.600 val_3d 0.53m
+    ft epoch 11/15 | train_xy 0.15m | val_xy 0.24m val_floor_acc 0.612 val_3d 0.51m
+    ft epoch 12/15 | train_xy 0.17m | val_xy 0.28m val_floor_acc 0.629 val_3d 0.52m
+    ft epoch 13/15 | train_xy 0.15m | val_xy 0.26m val_floor_acc 0.624 val_3d 0.52m
+    ft epoch 14/15 | train_xy 0.15m | val_xy 0.23m val_floor_acc 0.626 val_3d 0.52m
+    ft epoch 15/15 | train_xy 0.15m | val_xy 0.23m val_floor_acc 0.625 val_3d 0.51m
+[uji_b2] after +15 epochs: xy=0.35m floor_acc=0.579  (2033s)
+[uji_b2] naive: xy=36.75m floor_acc=0.251
+
+==============================================================================
+Summary
+==============================================================================
+uji_b1     | phase5c_v2 floor_acc=0.412 -> continued floor_acc=0.460
+uji_b2     | phase5c_v2 floor_acc=0.429 -> continued floor_acc=0.579
+
+Saved outputs to B:\Uni materials\WRC Internship\17th JUly\glob_tta_3d_localization\outputs\phase5c_uji_continue

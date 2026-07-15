@@ -1,5 +1,7 @@
-# Downloaded dataset -- reproducible, see PIVOT_PLAN.md for source URLs
+# Downloaded datasets -- reproducible, see PIVOT_PLAN.md for source URLs
 data/raw/
+data/raw_tampere/
+data/raw_uji_lib/
 
 # Trained model checkpoints -- large binaries, regenerate via scripts/*.py
 outputs/**/*.pt
@@ -8,3 +10,7 @@ outputs/**/*.pt
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
+
+# Node (paper/ build tooling)
+paper/node_modules/
+paper/~$*.docx

@@ -1,0 +1,121 @@
+Loading joint checkpoint + re-deriving splits/site_num_floors...
+[hdlc] 11790 rows, 384 groups, 17 AP columns (17/17 positioned), floors=[0, 1, 2]
+Stratified split: 3 floors, 384 groups -> train=268 val=58 test=58 groups. Floors missing from test: none, from val: none (train coverage guaranteed for all floors; too-scarce-for-test/val: none).
+[sod_cetc331] 1795 rows, 955 groups, 52 AP columns (52/52 positioned), floors=[1, 2, 3]
+Stratified split: 3 floors, 955 groups -> train=669 val=143 test=143 groups. Floors missing from test: none, from val: none (train coverage guaranteed for all floors; too-scarce-for-test/val: none).
+[sod_hcxy] 12230 rows, 465 groups, 56 AP columns (56/56 positioned), floors=[4]
+Stratified split: 1 floors, 465 groups -> train=325 val=70 test=70 groups. Floors missing from test: none, from val: none (train coverage guaranteed for all floors; too-scarce-for-test/val: none).
+[sod_syl] 9900 rows, 397 groups, 46 AP columns (46/46 positioned), floors=[4]
+Stratified split: 1 floors, 397 groups -> train=277 val=60 test=60 groups. Floors missing from test: none, from val: none (train coverage guaranteed for all floors; too-scarce-for-test/val: none).
+[uji_b1] 5196 rows, 12 groups, 520 AP columns (169/520 positioned), floors=[0, 1, 2, 3]
+[uji_b1] dropped 37/5196 rows with no positioned visible AP (0.7%).
+Stratified split: 4 floors, 12 groups -> train=4 val=4 test=4 groups. Floors missing from test: none, from val: none (train coverage guaranteed for all floors; too-scarce-for-test/val: none).
+[uji_b2] 9492 rows, 16 groups, 520 AP columns (153/520 positioned), floors=[0, 1, 2, 3, 4]
+[uji_b2] dropped 38/9492 rows with no positioned visible AP (0.4%).
+Stratified split: 5 floors, 16 groups -> train=7 val=4 test=5 groups. Floors missing from test: none, from val: none (train coverage guaranteed for all floors; too-scarce-for-test/val: [np.int64(4)]).
+
+==============================================================================
+Per-site fine-tuning (xy_head frozen, trunk + own floor_head adapted)
+==============================================================================
+
+--- hdlc ---
+    ft epoch 1/10 | train_xy 0.54m | val_xy 0.72m val_floor_acc 0.671 val_3d 1.11m
+    ft epoch 2/10 | train_xy 0.49m | val_xy 0.78m val_floor_acc 0.651 val_3d 1.18m
+    ft epoch 3/10 | train_xy 0.47m | val_xy 0.80m val_floor_acc 0.711 val_3d 1.07m
+    ft epoch 4/10 | train_xy 0.45m | val_xy 0.85m val_floor_acc 0.704 val_3d 1.12m
+    ft epoch 5/10 | train_xy 0.45m | val_xy 0.75m val_floor_acc 0.709 val_3d 1.12m
+    ft epoch 6/10 | train_xy 0.45m | val_xy 0.78m val_floor_acc 0.725 val_3d 1.16m
+    ft epoch 7/10 | train_xy 0.44m | val_xy 0.80m val_floor_acc 0.767 val_3d 1.03m
+    ft epoch 8/10 | train_xy 0.42m | val_xy 0.72m val_floor_acc 0.760 val_3d 1.10m
+    ft epoch 9/10 | train_xy 0.43m | val_xy 0.79m val_floor_acc 0.752 val_3d 1.06m
+    ft epoch 10/10 | train_xy 0.42m | val_xy 0.70m val_floor_acc 0.769 val_3d 1.01m
+[hdlc        ] joint     xy=  0.68m floor_acc=0.625
+[hdlc        ] finetuned xy=  0.64m floor_acc=0.749  (1998s)
+[hdlc        ] naive     xy= 13.05m floor_acc=0.302
+
+--- sod_cetc331 ---
+    ft epoch 1/10 | train_xy 1.17m | val_xy 1.72m val_floor_acc 0.946 val_3d 1.78m
+    ft epoch 2/10 | train_xy 1.13m | val_xy 1.52m val_floor_acc 0.946 val_3d 1.67m
+    ft epoch 3/10 | train_xy 1.15m | val_xy 1.55m val_floor_acc 0.952 val_3d 1.71m
+    ft epoch 4/10 | train_xy 1.15m | val_xy 1.53m val_floor_acc 0.952 val_3d 1.61m
+    ft epoch 5/10 | train_xy 1.10m | val_xy 1.59m val_floor_acc 0.946 val_3d 1.66m
+    ft epoch 6/10 | train_xy 1.05m | val_xy 1.57m val_floor_acc 0.952 val_3d 1.61m
+    ft epoch 7/10 | train_xy 1.09m | val_xy 1.56m val_floor_acc 0.946 val_3d 1.71m
+    ft epoch 8/10 | train_xy 1.11m | val_xy 1.54m val_floor_acc 0.952 val_3d 1.63m
+    ft epoch 9/10 | train_xy 1.05m | val_xy 1.64m val_floor_acc 0.952 val_3d 1.75m
+    ft epoch 10/10 | train_xy 1.05m | val_xy 1.53m val_floor_acc 0.939 val_3d 1.68m
+[sod_cetc331 ] joint     xy=  1.78m floor_acc=0.915
+[sod_cetc331 ] finetuned xy=  1.78m floor_acc=0.951  (314s)
+[sod_cetc331 ] naive     xy= 15.98m floor_acc=0.300
+
+--- sod_hcxy ---
+    ft epoch 1/10 | train_xy 1.28m | val_xy 1.91m val_floor_acc 1.000 val_3d 1.91m
+    ft epoch 2/10 | train_xy 1.22m | val_xy 1.86m val_floor_acc 1.000 val_3d 1.86m
+    ft epoch 3/10 | train_xy 1.20m | val_xy 1.86m val_floor_acc 1.000 val_3d 1.86m
+    ft epoch 4/10 | train_xy 1.18m | val_xy 1.70m val_floor_acc 1.000 val_3d 1.70m
+    ft epoch 5/10 | train_xy 1.15m | val_xy 1.89m val_floor_acc 1.000 val_3d 1.89m
+    ft epoch 6/10 | train_xy 1.12m | val_xy 1.74m val_floor_acc 1.000 val_3d 1.74m
+    ft epoch 7/10 | train_xy 1.11m | val_xy 1.72m val_floor_acc 1.000 val_3d 1.72m
+    ft epoch 8/10 | train_xy 1.08m | val_xy 1.72m val_floor_acc 1.000 val_3d 1.72m
+    ft epoch 9/10 | train_xy 1.08m | val_xy 1.71m val_floor_acc 1.000 val_3d 1.71m
+    ft epoch 10/10 | train_xy 1.07m | val_xy 1.85m val_floor_acc 1.000 val_3d 1.85m
+[sod_hcxy    ] joint     xy=  2.17m floor_acc=1.000
+[sod_hcxy    ] finetuned xy=  1.71m floor_acc=1.000  (2544s)
+[sod_hcxy    ] naive     xy= 36.27m floor_acc=1.000
+
+--- sod_syl ---
+    ft epoch 1/10 | train_xy 0.93m | val_xy 1.88m val_floor_acc 1.000 val_3d 1.88m
+    ft epoch 2/10 | train_xy 0.85m | val_xy 1.66m val_floor_acc 1.000 val_3d 1.66m
+    ft epoch 3/10 | train_xy 0.83m | val_xy 1.90m val_floor_acc 1.000 val_3d 1.90m
+    ft epoch 4/10 | train_xy 0.81m | val_xy 1.53m val_floor_acc 1.000 val_3d 1.53m
+    ft epoch 5/10 | train_xy 0.80m | val_xy 1.82m val_floor_acc 1.000 val_3d 1.82m
+    ft epoch 6/10 | train_xy 0.80m | val_xy 1.62m val_floor_acc 1.000 val_3d 1.62m
+    ft epoch 7/10 | train_xy 0.75m | val_xy 1.73m val_floor_acc 1.000 val_3d 1.73m
+    ft epoch 8/10 | train_xy 0.73m | val_xy 1.56m val_floor_acc 1.000 val_3d 1.56m
+    ft epoch 9/10 | train_xy 0.73m | val_xy 1.67m val_floor_acc 1.000 val_3d 1.67m
+    ft epoch 10/10 | train_xy 0.71m | val_xy 1.74m val_floor_acc 1.000 val_3d 1.74m
+[sod_syl     ] joint     xy=  1.81m floor_acc=1.000
+[sod_syl     ] finetuned xy=  1.72m floor_acc=1.000  (1992s)
+[sod_syl     ] naive     xy= 21.44m floor_acc=1.000
+
+--- uji_b1 ---
+    ft epoch 1/10 | train_xy 0.24m | val_xy 1.40m val_floor_acc 0.327 val_3d 3.77m
+    ft epoch 2/10 | train_xy 0.19m | val_xy 1.38m val_floor_acc 0.324 val_3d 3.81m
+    ft epoch 3/10 | train_xy 0.19m | val_xy 1.37m val_floor_acc 0.307 val_3d 3.76m
+    ft epoch 4/10 | train_xy 0.17m | val_xy 1.50m val_floor_acc 0.323 val_3d 3.80m
+    ft epoch 5/10 | train_xy 0.14m | val_xy 1.51m val_floor_acc 0.314 val_3d 3.81m
+    ft epoch 6/10 | train_xy 0.16m | val_xy 1.50m val_floor_acc 0.324 val_3d 3.81m
+    ft epoch 7/10 | train_xy 0.13m | val_xy 1.36m val_floor_acc 0.326 val_3d 3.80m
+    ft epoch 8/10 | train_xy 0.14m | val_xy 1.34m val_floor_acc 0.315 val_3d 3.81m
+    ft epoch 9/10 | train_xy 0.16m | val_xy 1.48m val_floor_acc 0.326 val_3d 3.79m
+    ft epoch 10/10 | train_xy 0.14m | val_xy 1.35m val_floor_acc 0.311 val_3d 3.81m
+[uji_b1      ] joint     xy=  1.19m floor_acc=0.343
+[uji_b1      ] finetuned xy=  1.24m floor_acc=0.379  (356s)
+[uji_b1      ] naive     xy= 96.36m floor_acc=0.280
+
+--- uji_b2 ---
+    ft epoch 1/10 | train_xy 0.41m | val_xy 0.52m val_floor_acc 0.277 val_3d 3.55m
+    ft epoch 2/10 | train_xy 0.29m | val_xy 0.50m val_floor_acc 0.300 val_3d 3.55m
+    ft epoch 3/10 | train_xy 0.25m | val_xy 0.51m val_floor_acc 0.302 val_3d 3.55m
+    ft epoch 4/10 | train_xy 0.19m | val_xy 0.50m val_floor_acc 0.321 val_3d 3.54m
+    ft epoch 5/10 | train_xy 0.20m | val_xy 0.51m val_floor_acc 0.334 val_3d 3.54m
+    ft epoch 6/10 | train_xy 0.19m | val_xy 0.51m val_floor_acc 0.350 val_3d 3.54m
+    ft epoch 7/10 | train_xy 0.19m | val_xy 0.50m val_floor_acc 0.357 val_3d 3.54m
+    ft epoch 8/10 | train_xy 0.16m | val_xy 0.50m val_floor_acc 0.362 val_3d 3.54m
+    ft epoch 9/10 | train_xy 0.19m | val_xy 0.50m val_floor_acc 0.371 val_3d 3.52m
+    ft epoch 10/10 | train_xy 0.18m | val_xy 0.50m val_floor_acc 0.377 val_3d 3.51m
+[uji_b2      ] joint     xy=  0.51m floor_acc=0.169
+[uji_b2      ] finetuned xy=  0.22m floor_acc=0.331  (1422s)
+[uji_b2      ] naive     xy= 51.57m floor_acc=0.159
+
+==============================================================================
+Summary: joint vs fine-tuned vs naive
+==============================================================================
+hdlc         | joint floor_acc=0.625 -> finetuned floor_acc=0.749 (naive=0.302)
+sod_cetc331  | joint floor_acc=0.915 -> finetuned floor_acc=0.951 (naive=0.300)
+sod_hcxy     | joint floor_acc=1.000 -> finetuned floor_acc=1.000 (naive=1.000)
+sod_syl      | joint floor_acc=1.000 -> finetuned floor_acc=1.000 (naive=1.000)
+uji_b1       | joint floor_acc=0.343 -> finetuned floor_acc=0.379 (naive=0.280)
+uji_b2       | joint floor_acc=0.169 -> finetuned floor_acc=0.331 (naive=0.159)
+
+Saved outputs to B:\Uni materials\WRC Internship\17th JUly\glob_tta_3d_localization\outputs\phase5c_v4

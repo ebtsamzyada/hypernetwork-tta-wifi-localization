@@ -1,0 +1,11 @@
+{
+  "n_instances": 7590,
+  "n_groups": 1265,
+  "n_sites": 6,
+  "stat_dim": 9,
+  "r2_rf_leave_points_out": 0.1517587066495505,
+  "r2_rf_random_cv": 0.18034823184405535,
+  "r2_ridge_leave_points_out": 0.16317049364358693,
+  "r2_point_identity_oracle": 0.6845851312065407,
+  "r2_rf_leave_site_out": -0.05197380758046899
+}

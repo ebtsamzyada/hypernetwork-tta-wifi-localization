@@ -631,3 +631,371 @@ documented, not new claims) plausibly explain why progress is SLOW and
 why a large gap to literature (74.9%/93.0%) remains even after 10 epochs
 -- but "slow" is not the same claim as "capped," and that distinction
 matters for anyone deciding whether to keep training these sites further.
+
+### Continued UJI fine-tuning (2026-07-14)
+
+Since both UJI sites were still visibly climbing at epoch 10, continued
+fine-tuning from the phase5c_v2 checkpoints for 15 more epochs each
+(`scripts/phase5c_uji_continue.py`, same setup: xy_head frozen, LR=3e-5,
+combined-3D-error model selection). Only `uji_b1`/`uji_b2` -- the other 4
+sites showed no comparable still-climbing signal at epoch 10 (sod_hcxy/syl
+trivial, sod_cetc331 flat, hdlc oscillating rather than trending).
+
+| site | phase5c_v2 (10ep) | +15 more epochs | naive | literature |
+|---|---|---|---|---|
+| uji_b1 | 0.67m / 41.2% | 0.67m / 46.0% | 0.000 | 74.9% |
+| uji_b2 | 0.50m / 42.9% | **0.35m / 57.9%** | 0.251 | 93.0% |
+
+`uji_b2` improved substantially and its val-floor-accuracy curve climbed
+smoothly and monotonically across all 15 additional epochs (50.9% ->
+62.9%, before test-time evaluation on the best-selected checkpoint gave
+57.9%) -- the gap to literature more than halved from where Phase 5c v1
+started (68.4pp -> 35.1pp). `uji_b1` improved more modestly (41.2% ->
+46.0%) and its val curve got visibly noisier this round (fluctuating in
+the 53-59% band rather than climbing cleanly) -- plausibly because it only
+has 12 total capture sessions to group-split on (the small-group
+fragility flagged in Phase 5a), so further gains there may need a lower
+learning rate or more sessions rather than just more epochs at the same
+setup, unlike uji_b2 which still looks like it has clean room to keep
+improving.
+
+### Early-stopping fine-tune, both sites converged (2026-07-14)
+
+Implemented proper patience-based early stopping
+(`finetune_one_site_early_stop` in `scripts/phase5c_finetune.py`:
+patience=6 epochs, min_delta=0.005m on the combined 3D validation metric,
+max_epochs=40 safety cap) instead of hand-picking epoch counts. Continued
+from the phase5c_uji_continue checkpoints: `uji_b2` at the same LR (3e-5,
+its curve was climbing cleanly), `uji_b1` at a reduced LR (1e-5, since its
+curve had gotten noisy rather than converging under the standard rate).
+
+Both runs triggered genuine early stopping this time (did not hit the
+max_epochs cap) -- the first results in this investigation that represent
+real convergence rather than a time-budget-limited snapshot.
+
+| site | converged at epoch | final xy/floor | naive floor | literature floor |
+|---|---|---|---|---|
+| uji_b1 | 22 (of 28 run) | 0.58m / **52.1%** | 0.000 | 74.9% |
+| uji_b2 | 10 (of 16 run) | 0.27m / **66.9%** | 0.251 | 93.0% |
+
+The lower LR for `uji_b1` worked as intended -- floor accuracy climbed
+steadily to 72.2% on validation before plateauing/oscillating, well past
+where the noisy standard-LR run had gotten stuck.
+
+### Full uji_b1/uji_b2 trajectory across this session, for the record
+
+| stage | uji_b1 floor acc | uji_b2 floor acc |
+|---|---|---|
+| v2 (joint, no fine-tune) | 30.5% | 33.7% |
+| v1 fine-tune (5ep, buggy xy-only selection) | 37.0% | 37.2% |
+| v2 fine-tune (10ep, fixed 3D-metric selection) | 41.2% | 42.9% |
+| +15 more epochs (same LR) | 46.0% | 57.9% |
+| early-stop, tuned LR, converged | **52.1%** | **66.9%** |
+
+Net gain from the original joint backbone: uji_b1 +21.6pp, uji_b2 +33.2pp.
+Remaining gap to literature: uji_b1 22.8pp (was 44.4pp), uji_b2 26.1pp
+(was 59.3pp) -- both gaps cut roughly in half or better over the course of
+this investigation, through legitimate training/tuning fixes (model-
+selection bug, epoch budget, per-site learning rate), not by touching the
+eval methodology.
+
+## Phase 5d: error analysis (2026-07-14)
+
+Implemented in `scripts/phase5d_error_analysis.py`: per-site spatial error
+heatmaps, floor confusion matrices, and a pooled check of the "sparse
+AP-position coverage drives error" hypothesis. Uses each site's best
+available checkpoint (early-stopped for uji_b1/uji_b2, phase5c_v2 for the
+rest). Figures in `outputs/phase5d_error_analysis/`.
+
+**AP-sparsity hypothesis: NOT well supported, walking this back.**
+Correlation between xy error and how many positioned APs were visible in
+a given reading is weak everywhere (|r| < 0.2 for all 6 sites, some sites
+even slightly negative as expected but barely so). This was one of the
+two explanations offered earlier for UJI's weaker floor performance --
+the per-row evidence doesn't support it as a row-level effect. Whatever
+role AP sparsity plays, it isn't "fewer positioned APs in this specific
+reading directly predicts worse error."
+
+**Floor confusion is physically sensible where it exists.** HDLC confuses
+ADJACENT floors far more than distant ones (floor 0<->1: 131/10, floor
+1<->2: 76/174, vs. floor 0<->2: 52/11) -- consistent with signal
+attenuating through one floor's thickness being a smaller effect than
+through two. sod_cetc331's confusion matrix is nearly clean (only 18
+off-diagonal out of 264), matching its 93%+ accuracy.
+
+**Major finding, not merely a modeling weakness: both UJI sites are
+missing an entire floor class from their TEST split**, a direct
+consequence of the coarse session-level grouping (12/16 total groups --
+the same fragility flagged back in Phase 5a). `uji_b1`'s test set has
+ZERO true floor-2 samples (confirmed: confusion matrix row sums to 0 out
+of ~915 rows), yet the model still predicts floor-2 for 185 rows (20.2%
+of test) -- every one of those is automatically wrong, with no true
+floor-2 sample it could ever match. `uji_b2` has the identical issue for
+floor-4, but far smaller (50/2446 rows, ~2%). This directly explains why
+`uji_b2` closed its literature gap so much faster than `uji_b1`
+throughout this session -- `uji_b1` has been fighting a ~20-point
+structural handicap in its own test set the whole time, not just a harder
+learning problem. **This is a split-methodology artifact inflating the
+apparent literature gap, not purely a representational limitation** --
+worth a floor-stratified grouped split as a follow-up fix before drawing
+final conclusions about UJI floor-classification quality, though not
+implemented in this pass.
+
+**Spatial error clusters at the AP-coverage periphery, consistently
+across floors.** `uji_b2`'s heatmap shows a clear, repeated hotspot at the
+building's geographic tail (the bottom-right extremity of its corridor
+shape) across floors 1, 2, and 3 alike -- an edge/extrapolation effect
+(the model interpolates well within the dense core of AP coverage,
+struggles at the boundary), not randomly distributed noise. HDLC's
+heatmap (narrow single corridor) didn't show as clear a spatial pattern,
+plausibly because there's less room for a true "periphery" to exist in
+that layout.
+
+## Bundled retrain: v3 (negative result), v4 (fix + recovery), second
+## zero-shot site (2026-07-14/15)
+
+Per the user's request, three fixes motivated by the Phase 5d error
+analysis were bundled into one retrain to save wall-clock time: (1)
+`stratified_grouped_split_by_floor` instead of plain grouped splitting,
+(2) ordinal floor regression instead of classification, (3) wider virtual-
+space margin/extent (2.0m/10.0m -> 3.0m/15.0m) to help peripheral-point
+error. Flagged explicitly before running that bundling forfeits the
+ability to attribute which change caused which effect.
+
+### v3 result: negative, not a clean win
+
+| site | v2 joint | v3 joint (bundled) |
+|---|---|---|
+| hdlc | 0.91m / 59.3% | 1.06m / 61.1% |
+| sod_cetc331 | 1.91m / 91.7% | 1.71m / 88.3% |
+| sod_hcxy | 1.90m / 100% | 2.13m / 100% |
+| sod_syl | 2.19m / 100% | 2.64m / 100% |
+| uji_b1 | 1.05m / 30.5% | 2.23m / 32.0% |
+| uji_b2 | 0.74m / 33.7% | 1.26m / 19.3% |
+| zero-shot uji_b0 | 1.14m | 3.16m |
+
+Almost every site's xy error got worse, and the headline zero-shot metric
+nearly tripled (1.14m -> 3.16m). A second, distinct bug also surfaced:
+`stratified_grouped_split_by_floor` v1 guaranteed test/val floor coverage
+unconditionally, which for `uji_b2` (only 16 groups, 5 floors) meant
+floor 4's only 2 groups both went to test+val, leaving TRAIN with zero
+floor-4 examples -- a worse failure mode than the one it was built to fix
+(a floor absent from train guarantees wrong predictions whenever it's the
+true answer; a floor merely absent from test just isn't scored).
+
+Diagnosis: the wider margin/extent was the most likely dominant cause,
+since it's the one change applied to literally every image regardless of
+site or floor-scarcity issues, matching the broad, near-universal xy
+degradation pattern -- not isolated to UJI or to floor-related sites,
+which is what a split- or loss-related cause would look like instead.
+
+### Fix: `stratified_grouped_split_by_floor` rewritten (train-safe)
+
+Rewrote the function to guarantee TRAIN coverage for every floor first
+(non-negotiable), and only pull a group into test/val if doing so
+provably leaves every floor it touches with >=1 other group still in
+train. Added a hard assertion that no floor can end up missing from
+train. Verified against the exact case that broke before (`uji_b2`, 16
+groups, 5 floors): train coverage now holds for every floor.
+
+### v4 result: recovers from v3, mostly beats v2
+
+Reverted margin/extent to v2's (2.0m, 10.0m); kept the (now train-safe)
+stratified split and the ordinal floor loss.
+
+| site | v2 | v3 (bad bundle) | v4 (fixed) |
+|---|---|---|---|
+| hdlc | 0.91m / 59.3% | 1.06m / 61.1% | 0.68m / 62.5% |
+| sod_cetc331 | 1.91m / 91.7% | 1.71m / 88.3% | 1.78m / 91.5% |
+| sod_hcxy | 1.90m / 100% | 2.13m / 100% | 2.17m / 100% |
+| sod_syl | 2.19m / 100% | 2.64m / 100% | 1.81m / 100% |
+| uji_b1 | 1.05m / 30.5% | 2.23m / 32.0% | 1.19m / 34.3% |
+| uji_b2 | 0.74m / 33.7% | 1.26m / 19.3% | 0.51m / 16.9%* |
+| zero-shot uji_b0 | 1.14m | 3.16m | 1.12m |
+
+*`uji_b2`'s floor number isn't a clean regression from v2: v2's test set
+was still missing floor-4 entirely (the Phase 5d bug), so v2's 33.7% was
+never actually scored against that floor. v4's test set genuinely
+includes floor-4 now (confirmed: "floors missing from test: none"), so
+16.9% is a harder, more complete, more honest number, not directly
+comparable to v2's on that specific axis.
+
+Zero-shot transfer fully recovered and slightly improved (1.14m -> 1.12m),
+confirming the margin/extent diagnosis: reverting just that one change
+(while keeping the split and loss fixes, which are net-positive) restored
+and then exceeded v2's quality almost everywhere.
+
+### Second independent zero-shot site: Tampere (2026-07-15)
+
+Held out entirely per the earlier decision to test generalization beyond
+the UJIIndoorLoc family specifically. Evaluated the v4 checkpoint, never
+trained on Tampere at all (`scripts/phase5b_zeroshot_eval.py`):
+
+**1.62m median xy error vs. 30.21m in-site naive baseline.**
+
+This is the more important of the two zero-shot results for the "is this
+actually foundational" question raised earlier in this project: `uji_b0`
+alone only tested generalization WITHIN the UJIIndoorLoc family (two of
+its three buildings were already in the training pool). Tampere is a
+genuinely different dataset -- different country (Finland vs.
+Spain/Malaysia/China), different collection methodology (crowdsourced
+across 21 devices vs. professional/session-based collection), and zero
+representation in the pretraining pool. Two independent zero-shot
+successes across two unrelated dataset families is meaningfully stronger
+evidence of real transfer than one success within a single family.
+
+### Phase 5c v4: fine-tuning -- best result of the project so far (2026-07-15)
+
+Same protocol as v2/5c (freeze `xy_head`, fine-tune trunk + per-site floor
+head, 10 epochs, combined-3D-metric selection), applied to the v4 joint
+checkpoint.
+
+| site | joint (v4) | fine-tuned (v4) | literature |
+|---|---|---|---|
+| hdlc | 0.68m / 62.5% | **0.64m / 74.9%** | (Phase 2: 0.85m/78.4% -- gap now 3.5pp, down from 19.1pp originally) |
+| sod_cetc331 | 1.78m / 91.5% | **1.78m / 95.1%** | 0.85m / 98.9% |
+| sod_hcxy | 2.17m / 100% | 1.71m / 100% | 1.60m / -- |
+| sod_syl | 1.81m / 100% | 1.72m / 100% | 2.20m / -- (beats literature) |
+| uji_b1 | 1.19m / 34.3% | 1.24m / 37.9% | 7.85m / 74.9% |
+| uji_b2 | 0.51m / 16.9% | **0.22m / 33.1%** | 8.15m / 93.0% |
+
+Every site improved floor accuracy; most improved xy too. This is the
+best checkpoint set produced in this project across all iterations
+(v1 through v4, plus the continued/early-stop UJI experiments). Combined
+with both zero-shot successes (uji_b0: 1.12m/41.80m naive; tampere:
+1.62m/30.21m naive, both unaffected by this fine-tuning stage since they
+evaluate the frozen v4 joint checkpoint directly), this is the headline
+result set for the paper.
+
+Outputs: `outputs/phase5c_v4/model_<site_id>.pt` (per-site specialized
+checkpoints), `outputs/phase5c_v4/results.json`. The v4 joint checkpoint
+(`outputs/phase5b_v4/model.pt`) remains the reusable "foundation model"
+artifact for any future new/zero-shot site.
+
+## Phase 6: oracle diagnostic retry with synthetic drift (2026-07-15)
+
+Implemented in `scripts/phase6_oracle_diagnostic.py`. Per the earlier
+pivot decision, retried the oracle diagnostic using SYNTHETIC,
+spatially-generic drift (`random_drift_snapshot`, ported directly from
+`wifi_tta/src/drift_simulator.py`: a buffer perturbed with one randomly
+sampled random-walk-attenuation-severity + dropout-probability pair,
+severity drawn independently per instance, decoupled from which physical
+point it is) instead of HDLC's real, location-entangled Layout 1->2/3
+obstruction drift. Same reference-relative buffer-stats design and
+three-way comparison as Phase 4, run against the best available frozen
+model (Phase 5c v4 fine-tuned HDLC checkpoint), on the same 116 points
+held out from that model's training.
+
+One implementation issue found and fixed: severe synthetic drift
+(dropout up to 60%, walk severity up to 20dB) can occasionally zero out
+every visible AP in a reading -- a genuine total-signal-loss scenario,
+not a bug. Handled by scoring those rows with a fixed large penalty error
+(30m) rather than silently skipping them, since skipping would bias the
+diagnostic's target to look better than reality under severe drift.
+
+### Result: a real, non-negative signal appears -- but still not a green light
+
+| predictor | Phase 4 (HDLC real drift) | Phase 6 (synthetic drift) |
+|---|---|---|
+| Leave-points-out RandomForest | -0.070 | **0.096** |
+| Random (non-grouped) RandomForest | 0.538 | 0.146 |
+| Leave-points-out Ridge (linear) | -0.098 | 0.057 |
+| Point-identity ALONE (oracle) | 0.538 | 0.333 |
+
+**Confirms the Phase 4 root-cause diagnosis.** Switching to spatially-
+generic synthetic drift produced a real, non-negative signal (both RF and
+Ridge went from clearly negative to weakly positive R^2) where HDLC's
+real, location-fixed obstruction drift produced essentially nothing. This
+is direct evidence that the earlier negative result was about HDLC's
+specific drift structure, not an inherent property of this backbone or
+buffer-stats approach.
+
+**Still not a green light, per the non-negotiable discipline.** Point
+identity alone (R^2=0.333) still predicts drift-induced error better than
+the actual buffer statistics do (0.096-0.146) -- the same confound
+signature the diagnostic exists to catch, just less severe than Phase 4's
+0.538-vs-0.538 near-total-overlap. This result now resembles the prior
+project's CSI pipeline finding (real but location-dominated signal,
+R^2~0.22 vs ~0.375) more than HDLC's original flat-zero result -- a
+genuinely different, more informative negative result, not a repeat.
+
+### Phase 6b: pooled across 6 sites -- confound gets WORSE, not better (2026-07-15)
+
+Tried the natural next experiment: pooled buffer instances across all 6
+pretraining sites (`scripts/phase6b_oracle_diagnostic_pooled.py`) to test
+whether HDLC-alone's point-identity dominance was an artifact of only
+having 116 points to memorize. Required switching from per-AP-dimension
+buffer stats (3 x num_APs, incompatible across sites with 17 to 520 APs)
+to fixed-size (9-dim) aggregate statistics (mean/std/max of detect-rate
+and RSSI-diff, plus AP count) so every site produces a comparable feature
+vector. Also added a leave-SITE-out test (not just leave-points-out) as
+the strictest possible generalization check.
+
+| predictor | HDLC alone (6) | Pooled, 6 sites (6b) |
+|---|---|---|
+| Leave-points-out RF | 0.096 | 0.152 |
+| Leave-points-out Ridge | 0.057 | 0.163 |
+| Point-identity alone | 0.333 | **0.685** |
+| Leave-SITE-out RF | -- | **-0.052** |
+
+Pooling made the confound WORSE: identity-alone R^2 roughly doubled, and
+the leave-site-out test -- predicting an entirely unseen site's error
+using only patterns learned from other sites -- is negative. Root cause:
+the AP-count feature is a near-literal site fingerprint (each site has a
+fixed, distinct AP count), and different sites have very different
+baseline error scales, so pooling let the regressor learn "these stats
+look like site X" rather than anything about drift.
+
+### Phase 6c: final trial -- two principled fixes, still negative (2026-07-15)
+
+Agreed with the user this would be the last trial regardless of outcome.
+Two fixes, both conceptually motivated (not tuning-for-a-number):
+(1) dropped the AP-count feature (`scripts/phase6c_oracle_diagnostic_normalized.py`);
+(2) normalized the target per site (subtract each site's own median
+per-buffer error) -- the conceptually correct framing for TTA, which
+should predict drift-induced degradation RELATIVE TO a site's own normal
+condition, not absolute difficulty.
+
+| predictor | raw, AP-count dropped only | + per-site target normalization |
+|---|---|---|
+| Leave-points-out RF | 0.150 | 0.025 |
+| Point-identity alone | 0.685 | 0.635 |
+| Leave-SITE-out RF | -0.047 | **-0.268** |
+
+Dropping AP-count alone barely moved anything (the other aggregate
+features already encode enough site character on their own). Target
+normalization made leave-site-out WORSE, not better: removing between-
+site variance left only within-site variance, which point identity still
+dominates (0.635) even there.
+
+### Final verdict on Phase 6: negative, well-evidenced, not pursued further
+
+Four independent tests -- HDLC-alone/real-drift (Phase 4), HDLC-alone/
+synthetic-drift (Phase 6), pooled/synthetic-drift (Phase 6b), pooled/
+synthetic-drift with two principled confound fixes (Phase 6c) -- all
+converge on the same conclusion: reference-relative buffer statistics, in
+this design, do not carry a cross-site-generalizable signal about
+drift-induced error on this backbone and these datasets. Point/site
+identity dominates every version tried. This is treated as a closed,
+root-caused negative result, not an open question -- per the project's
+own discipline against open-ended tuning once a finding replicates this
+consistently.
+
+**Standing result for the paper: Phase 6 (single-site HDLC, synthetic
+drift)** -- the least-bad, most directly comparable version of this
+finding (R^2=0.096 RF / 0.057 Ridge vs. identity=0.333), reported
+alongside Phase 4's real-drift result as two independent negative
+findings with a shared root cause, with Phase 6b/6c's pooled attempts
+noted as confirming rather than overturning the conclusion.
+
+Honest next steps for anyone continuing this line of work (not attempted
+here): buffer statistics designed to NOT correlate with site/point
+identity at all (a genuinely hard feature-design problem, not solved by
+dropping one obviously-bad feature), or substantially more independent
+deployment sessions per site (closer to the prior project's 12+ sessions
+per building) so a regressor has enough real drift diversity to learn
+from that isn't confounded with location in the first place.
+
+Raw results: `outputs/phase6/oracle_diagnostic_synthetic_drift.json`,
+`outputs/phase6b/oracle_diagnostic_pooled.json`,
+`outputs/phase6c/oracle_diagnostic_normalized.json`.

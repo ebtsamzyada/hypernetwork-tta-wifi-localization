@@ -1,0 +1,106 @@
+==============================================================================
+Loading + splitting all 6 pretraining-pool sites
+==============================================================================
+[hdlc] 11790 rows, 384 groups, 17 AP columns (17/17 positioned), floors=[0, 1, 2]
+Stratified split: 3 floors, 384 groups -> train=268 val=58 test=58 groups. Floors missing from test: none, from val: none, from train: none.
+
+[sod_cetc331] 1795 rows, 955 groups, 52 AP columns (52/52 positioned), floors=[1, 2, 3]
+Stratified split: 3 floors, 955 groups -> train=669 val=143 test=143 groups. Floors missing from test: none, from val: none, from train: none.
+
+[sod_hcxy] 12230 rows, 465 groups, 56 AP columns (56/56 positioned), floors=[4]
+Stratified split: 1 floors, 465 groups -> train=325 val=70 test=70 groups. Floors missing from test: none, from val: none, from train: none.
+
+[sod_syl] 9900 rows, 397 groups, 46 AP columns (46/46 positioned), floors=[4]
+Stratified split: 1 floors, 397 groups -> train=277 val=60 test=60 groups. Floors missing from test: none, from val: none, from train: none.
+
+[uji_b1] 5196 rows, 12 groups, 520 AP columns (169/520 positioned), floors=[0, 1, 2, 3]
+[uji_b1] dropped 37/5196 rows with no positioned visible AP (0.7%).
+Stratified split: 4 floors, 12 groups -> train=4 val=4 test=4 groups. Floors missing from test: none, from val: none, from train: none.
+
+[uji_b2] 9492 rows, 16 groups, 520 AP columns (153/520 positioned), floors=[0, 1, 2, 3, 4]
+[uji_b2] dropped 38/9492 rows with no positioned visible AP (0.4%).
+Stratified split: 5 floors, 16 groups -> train=6 val=5 test=5 groups. Floors missing from test: none, from val: none, from train: [np.int64(4)].
+
+Combined training pool: 29623 rows across 6 sites
+Combined validation pool: 11148 rows
+
+Using device: cpu
+Balanced sampler: site sizes {'hdlc': 8200, 'sod_cetc331': 1259, 'sod_hcxy': 8530, 'sod_syl': 6810, 'uji_b1': 1343, 'uji_b2': 3481}, oversampling every site up to 8530 draws/epoch (51180 total draws/epoch vs 29623 rows unweighted).
+  epoch  1/8 | train_median_xy 2.69m | val_median_xy 2.33m val_median_3d 3.89m
+      val[hdlc        ] xy=   1.27m  floor_acc=0.528  3d_err=   2.91m
+      val[sod_cetc331 ] xy=   2.36m  floor_acc=0.604  3d_err=   3.59m
+      val[sod_hcxy    ] xy=   2.62m  floor_acc=1.000  3d_err=   2.62m
+      val[sod_syl     ] xy=   2.59m  floor_acc=1.000  3d_err=   2.59m
+      val[uji_b1      ] xy=   3.83m  floor_acc=0.346  3d_err=   5.43m
+      val[uji_b2      ] xy=   2.51m  floor_acc=0.170  3d_err=   7.07m
+  epoch  2/8 | train_median_xy 1.72m | val_median_xy 2.04m val_median_3d 3.72m
+      val[hdlc        ] xy=   1.27m  floor_acc=0.450  3d_err=   3.53m
+      val[sod_cetc331 ] xy=   1.82m  floor_acc=0.588  3d_err=   3.63m
+      val[sod_hcxy    ] xy=   2.31m  floor_acc=1.000  3d_err=   2.31m
+      val[sod_syl     ] xy=   2.70m  floor_acc=1.000  3d_err=   2.70m
+      val[uji_b1      ] xy=   3.19m  floor_acc=0.329  3d_err=   5.09m
+      val[uji_b2      ] xy=   1.97m  floor_acc=0.172  3d_err=   7.02m
+  epoch  3/8 | train_median_xy 1.53m | val_median_xy 2.08m val_median_3d 3.66m
+      val[hdlc        ] xy=   1.18m  floor_acc=0.573  3d_err=   3.51m
+      val[sod_cetc331 ] xy=   2.44m  floor_acc=0.665  3d_err=   3.43m
+      val[sod_hcxy    ] xy=   2.20m  floor_acc=1.000  3d_err=   2.20m
+      val[sod_syl     ] xy=   2.24m  floor_acc=1.000  3d_err=   2.24m
+      val[uji_b1      ] xy=   3.00m  floor_acc=0.298  3d_err=   4.73m
+      val[uji_b2      ] xy=   2.03m  floor_acc=0.179  3d_err=   7.02m
+  epoch  4/8 | train_median_xy 1.43m | val_median_xy 1.81m val_median_3d 3.62m
+      val[hdlc        ] xy=   1.15m  floor_acc=0.602  3d_err=   2.12m
+      val[sod_cetc331 ] xy=   2.23m  floor_acc=0.661  3d_err=   3.15m
+      val[sod_hcxy    ] xy=   1.95m  floor_acc=1.000  3d_err=   1.95m
+      val[sod_syl     ] xy=   2.42m  floor_acc=1.000  3d_err=   2.42m
+      val[uji_b1      ] xy=   3.05m  floor_acc=0.280  3d_err=   5.07m
+      val[uji_b2      ] xy=   1.70m  floor_acc=0.179  3d_err=   7.00m
+  epoch  5/8 | train_median_xy 1.32m | val_median_xy 1.79m val_median_3d 3.59m
+      val[hdlc        ] xy=   1.19m  floor_acc=0.612  3d_err=   2.26m
+      val[sod_cetc331 ] xy=   2.03m  floor_acc=0.888  3d_err=   2.46m
+      val[sod_hcxy    ] xy=   2.00m  floor_acc=1.000  3d_err=   2.00m
+      val[sod_syl     ] xy=   2.07m  floor_acc=1.000  3d_err=   2.07m
+      val[uji_b1      ] xy=   2.52m  floor_acc=0.261  3d_err=   4.66m
+      val[uji_b2      ] xy=   1.55m  floor_acc=0.173  3d_err=   7.00m
+  epoch  6/8 | train_median_xy 1.24m | val_median_xy 1.70m val_median_3d 3.57m
+      val[hdlc        ] xy=   1.07m  floor_acc=0.636  3d_err=   2.05m
+      val[sod_cetc331 ] xy=   2.12m  floor_acc=0.898  3d_err=   2.41m
+      val[sod_hcxy    ] xy=   2.07m  floor_acc=1.000  3d_err=   2.07m
+      val[sod_syl     ] xy=   1.98m  floor_acc=1.000  3d_err=   1.98m
+      val[uji_b1      ] xy=   2.29m  floor_acc=0.299  3d_err=   4.63m
+      val[uji_b2      ] xy=   1.56m  floor_acc=0.192  3d_err=   7.00m
+  epoch  7/8 | train_median_xy 1.18m | val_median_xy 1.70m val_median_3d 3.54m
+      val[hdlc        ] xy=   1.09m  floor_acc=0.634  3d_err=   1.92m
+      val[sod_cetc331 ] xy=   1.95m  floor_acc=0.882  3d_err=   2.44m
+      val[sod_hcxy    ] xy=   2.14m  floor_acc=1.000  3d_err=   2.14m
+      val[sod_syl     ] xy=   2.14m  floor_acc=1.000  3d_err=   2.14m
+      val[uji_b1      ] xy=   2.26m  floor_acc=0.312  3d_err=   4.79m
+      val[uji_b2      ] xy=   1.51m  floor_acc=0.201  3d_err=   7.00m
+  epoch  8/8 | train_median_xy 1.16m | val_median_xy 1.62m val_median_3d 3.54m
+      val[hdlc        ] xy=   1.01m  floor_acc=0.647  3d_err=   1.82m
+      val[sod_cetc331 ] xy=   1.80m  floor_acc=0.949  3d_err=   1.81m
+      val[sod_hcxy    ] xy=   2.08m  floor_acc=1.000  3d_err=   2.08m
+      val[sod_syl     ] xy=   2.27m  floor_acc=1.000  3d_err=   2.27m
+      val[uji_b1      ] xy=   2.57m  floor_acc=0.289  3d_err=   4.85m
+      val[uji_b2      ] xy=   1.50m  floor_acc=0.193  3d_err=   6.96m
+
+Training took 10024.4s for 8 epochs
+
+==============================================================================
+Final per-site test results vs. naive baseline
+==============================================================================
+[hdlc        ] model xy=   1.06m  floor_acc=0.611  3d_err=   1.86m   ||   naive xy=  13.05m  floor_acc=0.302
+[sod_cetc331 ] model xy=   1.71m  floor_acc=0.883  3d_err=   2.19m   ||   naive xy=  15.98m  floor_acc=0.300
+[sod_hcxy    ] model xy=   2.13m  floor_acc=1.000  3d_err=   2.13m   ||   naive xy=  36.27m  floor_acc=1.000
+[sod_syl     ] model xy=   2.64m  floor_acc=1.000  3d_err=   2.64m   ||   naive xy=  21.44m  floor_acc=1.000
+[uji_b1      ] model xy=   2.23m  floor_acc=0.320  3d_err=   4.30m   ||   naive xy=  96.36m  floor_acc=0.280
+[uji_b2      ] model xy=   1.26m  floor_acc=0.193  3d_err=   4.61m   ||   naive xy=  50.37m  floor_acc=0.159
+
+==============================================================================
+Zero-shot evaluation: uji_b0 (NEVER trained on -- no floor head exists for it)
+==============================================================================
+[uji_b0] 5249 rows, 2 groups, 520 AP columns (150/520 positioned), floors=[0, 1, 2, 3]
+[uji_b0] dropped 1/5249 rows with no positioned visible AP (0.0%).
+[uji_b0] zero-shot model xy=3.16m (floor: N/A, no head for an unseen site)   ||   in-site naive xy=41.80m
+Zero-shot backbone beats in-site naive baseline: True
+
+Saved outputs to B:\Uni materials\WRC Internship\17th JUly\glob_tta_3d_localization\outputs\phase5b_v3

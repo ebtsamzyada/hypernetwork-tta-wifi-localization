@@ -1,0 +1,10 @@
+{
+  "drift_mechanism": "synthetic_random_walk_dropout",
+  "n_instances": 928,
+  "n_points": 116,
+  "stat_dim": 51,
+  "r2_rf_leave_points_out": 0.09624644251697723,
+  "r2_rf_random_cv": 0.14638301486983807,
+  "r2_ridge_leave_points_out": 0.05654325759618173,
+  "r2_point_identity_oracle": 0.3332376128199116
+}

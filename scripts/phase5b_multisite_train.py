@@ -26,16 +26,24 @@ from sites import (  # noqa: E402
     HELDOUT_SITE_ID, PRETRAIN_SITE_IDS,
     attach_floor_class, build_floor_class_map, filter_locatable_rows, load_site,
 )
-from splits import grouped_split_by_column  # noqa: E402
+from splits import stratified_grouped_split_by_floor  # noqa: E402
 
-OUTDIR = Path(__file__).resolve().parents[1] / "outputs" / "phase5b_v2"
-EPOCHS = 8  # v1 was 5 epochs, plain concatenation+shuffle (outputs/phase5b,
-            # kept for comparison). v2 adds site-balanced oversampling
-            # (train_model_multisite's balanced=True default -- every site
-            # oversampled up to the largest site's row count, ~2.2x more
-            # rows/epoch) to investigate the HDLC floor-accuracy regression
-            # and sod_cetc331/uji under-representation -- see PIVOT_PLAN.md.
+OUTDIR = Path(__file__).resolve().parents[1] / "outputs" / "phase5b_v4"
+EPOCHS = 8
 SEED = 42
+
+# v3 (outputs/phase5b_v3) bundled three fixes from Phase 5d's error
+# analysis in one retrain and made things WORSE almost everywhere,
+# including nearly tripling the headline zero-shot error (1.14m -> 3.16m)
+# -- see PIVOT_PLAN.md "v3 bundled retrain, negative result". Most likely
+# cause: the wider margin/extent applied to EVERY image, not just
+# peripheral ones, diluting spatial precision broadly. v4 reverts margin/
+# extent to v2's original values and fixes a second bug the v3 run
+# surfaced (stratified_grouped_split_by_floor could starve TRAIN of a
+# floor to guarantee test/val coverage -- worse than the problem it was
+# meant to fix; see splits.py), while keeping the ordinal floor loss and
+# the (now train-safe) stratified split.
+HP_OVERRIDES = dict(margin_m=2.0, max_extent_m=10.0)
 
 
 def naive_baseline_generic(train_df, eval_df):
@@ -46,7 +54,7 @@ def naive_baseline_generic(train_df, eval_df):
 
 def main():
     OUTDIR.mkdir(parents=True, exist_ok=True)
-    hp = HyperParams()
+    hp = HyperParams(**HP_OVERRIDES)
 
     site_train, site_val, site_test = {}, {}, {}
     site_meta = {}
@@ -61,7 +69,8 @@ def main():
         floor_map = build_floor_class_map(df)
         df = attach_floor_class(df, floor_map)
         df = filter_locatable_rows(df, wap_pos, wap_cols, hp.k_strongest, site_id)
-        train_df, val_df, test_df = grouped_split_by_column(df, "_group", val_frac=0.15, test_frac=0.15, seed=SEED)
+        train_df, val_df, test_df = stratified_grouped_split_by_floor(df, "_group", "floor_id",
+                                                                        val_frac=0.15, test_frac=0.15, seed=SEED)
 
         site_train[site_id] = train_df
         site_val[site_id] = val_df

@@ -46,7 +46,11 @@ def run_epoch_multisite(model, dataset, hp, optimizer=None, device="cpu", sample
         loader = DataLoader(dataset, batch_size=1, shuffle=train_mode,
                              collate_fn=collate_single, num_workers=0)
     mse = nn.MSELoss()
-    ce = nn.CrossEntropyLoss()
+    # Ordinal floor loss: SmoothL1 (Huber) regression on the floor index,
+    # not cross-entropy -- penalizes being off by 2 floors more than off by
+    # 1, matching the adjacent-floor confusion pattern found in Phase 5d.
+    # See multisite_model.py's docstring.
+    floor_loss_fn = nn.SmoothL1Loss()
 
     records = []  # per-sample dicts, tagged with site_id
     step = 0
@@ -62,12 +66,12 @@ def run_epoch_multisite(model, dataset, hp, optimizer=None, device="cpu", sample
             target_xy = sample["target_xy"].unsqueeze(0).to(device)
             floor_class = sample["target_floor_class"]
 
-            xy_pred, floor_logits = model(img, site_id)
+            xy_pred, floor_pred = model(img, site_id)
             loss_xy = mse(xy_pred, target_xy)
 
-            if floor_logits is not None:
-                target_floor_t = torch.tensor([floor_class], dtype=torch.long, device=device)
-                loss_floor = ce(floor_logits, target_floor_t)
+            if floor_pred is not None:
+                target_floor_t = torch.tensor([[float(floor_class)]], device=device)
+                loss_floor = floor_loss_fn(floor_pred, target_floor_t)
                 loss = loss_xy + hp.lambda_floor * loss_floor
             else:
                 loss = loss_xy
@@ -84,8 +88,10 @@ def run_epoch_multisite(model, dataset, hp, optimizer=None, device="cpu", sample
             pred_xy = xy_pred.detach().cpu().numpy()[0] * PIXEL_METERS + origin
             xy_err = float(np.linalg.norm(pred_xy - true_xy))
 
-            if floor_logits is not None:
-                pred_floor_class = int(torch.argmax(floor_logits, dim=1).item())
+            if floor_pred is not None:
+                num_floors = model.site_num_floors[site_id]
+                raw_floor = float(floor_pred.detach().cpu().item())
+                pred_floor_class = int(round(min(max(raw_floor, 0.0), num_floors - 1)))
                 floor_ok = pred_floor_class == floor_class
             else:
                 pred_floor_class, floor_ok = None, None
@@ -128,10 +134,13 @@ def summarize_records(records):
             median_3d = float(np.median(combined_3d))
         else:
             median_3d = float("nan")
+        floor_mae = (float(np.mean([abs(r["pred_floor_class"] - r["true_floor_class"]) for r in floor_recs]))
+                     if floor_recs else float("nan"))
         per_site[site_id] = {
             "n": len(recs),
             "median_xy_err_m": float(np.median(xy_errs)),
             "floor_accuracy": floor_acc,
+            "floor_mae": floor_mae,
             "median_3d_err_m": median_3d,
         }
 
